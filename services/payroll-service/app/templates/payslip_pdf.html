@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payslip</title>
+    <style>
+        body { font-family: sans-serif; margin: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .total-row { font-weight: bold; background-color: #fafafa; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PeoplePay360</h1>
+        <h3>Payslip for Period: {{ payrun.period_start }} to {{ payrun.period_end }}</h3>
+    </div>
+    <p><strong>Employee ID:</strong> {{ payslip.employee_id }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Rule Name</th>
+                <th>Category</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in payslip.lines %}
+            <tr>
+                <td>{{ line.rule_name }}</td>
+                <td>{{ line.category }}</td>
+                <td>{{ "%.2f"|format(line.amount) }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="2">Net Salary</td>
+                <td>{{ "%.2f"|format(payslip.net_salary) }}</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
