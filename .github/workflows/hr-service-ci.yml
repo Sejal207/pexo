@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          pytest services/hr-service/tests
+          PYTHONPATH=services/hr-service pytest services/hr-service/tests
