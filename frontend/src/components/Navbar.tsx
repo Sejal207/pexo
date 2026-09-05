@@ -1,7 +1,43 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Calendar, CalendarClock, DollarSign, FileText, LayoutDashboard } from 'lucide-react';
+import { Users, Calendar, CalendarClock, ChevronDown, DollarSign, FileText, LayoutDashboard } from 'lucide-react';
 import { AttendanceWidget } from '../features/attendance/components/AttendanceWidget';
+
+const TimeOffMenu: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"
+      >
+        <CalendarClock className="w-4 h-4" />
+        <span>Time Off</span>
+        <ChevronDown className="w-3.5 h-3.5" />
+      </button>
+      {isOpen && (
+        <div className="absolute left-0 top-11 z-50 w-44 rounded-lg border border-slate-700/60 bg-slate-800 py-1 shadow-2xl">
+          <Link to="/time-off" onClick={() => setIsOpen(false)} className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white">Requests</Link>
+          <Link to="/time-off/allocations" onClick={() => setIsOpen(false)} className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white">Allocations</Link>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const Navbar: React.FC = () => {
   return (
@@ -16,7 +52,7 @@ export const Navbar: React.FC = () => {
           <Link to="/employees" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><Users className="w-4 h-4" /><span>Employees</span></Link>
           <Link to="/contracts" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><FileText className="w-4 h-4" /><span>Contracts</span></Link>
           <Link to="/attendance" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><Calendar className="w-4 h-4" /><span>Attendance</span></Link>
-          <Link to="/time-off" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><CalendarClock className="w-4 h-4" /><span>Time Off</span></Link>
+          <TimeOffMenu />
           <Link to="/payroll" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><DollarSign className="w-4 h-4" /><span>Payroll</span></Link>
         </nav>
         <AttendanceWidget />
