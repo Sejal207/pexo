@@ -108,6 +108,25 @@ async def create_allocation(
     return await service.create(allocation_in)
 
 
+@router.get("/allocations/{allocation_id}", response_model=AllocationOut)
+async def get_allocation(
+    allocation_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    service = AllocationService(db)
+    allocation = await service.get_by_id(allocation_id)
+    if allocation is None:
+        raise HTTPException(status_code=404, detail="Allocation not found")
+
+    roles = set(current_user.get("roles", []))
+    if not roles & READ_ALL_ROLES:
+        self_id = get_self_employee_id(current_user)
+        if not self_id or allocation.employee_id != self_id:
+            raise HTTPException(status_code=403, detail="This allocation does not belong to you")
+    return allocation
+
+
 @router.post("/allocations/{allocation_id}/approve", response_model=AllocationOut)
 async def approve_allocation(
     allocation_id: UUID,
@@ -152,6 +171,25 @@ async def create_request(
 ):
     service = TimeOffRequestService(db)
     return await service.create(employee_id, request_in)
+
+
+@router.get("/requests/{request_id}", response_model=TimeOffRequestOut)
+async def get_request(
+    request_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    service = TimeOffRequestService(db)
+    request = await service.get_by_id(request_id)
+    if request is None:
+        raise HTTPException(status_code=404, detail="Time off request not found")
+
+    roles = set(current_user.get("roles", []))
+    if not roles & READ_ALL_ROLES:
+        self_id = get_self_employee_id(current_user)
+        if not self_id or request.employee_id != self_id:
+            raise HTTPException(status_code=403, detail="This request does not belong to you")
+    return request
 
 
 @router.post("/requests/{request_id}/approve", response_model=TimeOffRequestOut)

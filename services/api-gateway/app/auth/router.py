@@ -48,8 +48,13 @@ def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
 async def _issue_tokens(user: AppUser, db: AsyncSession, response: Response) -> TokenResponse:
     access_token = create_access_token({
         "sub": str(user.id),
+        "user_id": str(user.id),
         "email": user.email,
         "roles": [role.name for role in user.roles],
+        # Downstream services (attendance check-in/out, "my own record" scoping)
+        # key off this claim directly — it was missing entirely, so any
+        # employee-scoped self-service endpoint always saw "not linked."
+        "employee_id": str(user.employee_id) if user.employee_id else None,
     })
 
     refresh_token = create_refresh_token()

@@ -42,7 +42,10 @@ _client: Optional[httpx.AsyncClient] = None
 def _get_client() -> httpx.AsyncClient:
     global _client
     if _client is None:
-        _client = httpx.AsyncClient(timeout=30.0)
+        # Generous timeout: payroll's mark-paid runs PDF generation inline
+        # when no Celery broker is configured (CELERY_TASK_ALWAYS_EAGER),
+        # which is slower than a typical request but still synchronous.
+        _client = httpx.AsyncClient(timeout=90.0)
     return _client
 
 
