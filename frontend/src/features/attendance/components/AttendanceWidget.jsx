@@ -1,15 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Power } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Power, Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { httpClient } from '../../../api/httpClient';
-import { checkIn, checkOut, togglePopup, closePopup } from '../attendanceWidgetSlice';
+import { checkIn, checkOut, syncWidgetStatus, togglePopup, closePopup } from '../attendanceWidgetSlice';
 
-const formatClock = (isoString) => new Date(isoString).toLocaleTimeString('en-US', {
-  hour: 'numeric', minute: '2-digit',
-});
+const formatClock = (isoString) => {
+  if (!isoString) return '';
+  try {
+    return new Date(isoString).toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit',
+    });
+  } catch (_) {
+    return String(isoString);
+  }
+};
 
 const formatDuration = (fromIso) => {
+  if (!fromIso) return '0h00';
   const ms = Date.now() - new Date(fromIso).getTime();
   const totalMinutes = Math.max(0, Math.floor(ms / 60000));
   const hours = Math.floor(totalMinutes / 60);
@@ -19,15 +27,37 @@ const formatDuration = (fromIso) => {
 
 export const AttendanceWidget = () => {
   const dispatch = useAppDispatch();
-  const { isOpen, isCheckedIn, checkInAt } = useAppSelector((state) => state.attendanceWidget);
+  const queryClient = useQueryClient();
+  const { isOpen, isCheckedIn, checkInAt, attendanceId } = useAppSelector((state) => state.attendanceWidget);
   const user = useAppSelector((state) => state.auth.user);
   const userName = user?.full_name ?? (user?.email ? user.email.split('@')[0].replace(/[._]/g, ' ') : 'there');
 
   const [elapsed, setElapsed] = useState(checkInAt ? formatDuration(checkInAt) : '0h00');
+  const [errorMessage, setErrorMessage] = useState('');
   const panelRef = useRef(null);
 
+  // Sync with backend widget status on load
+  const { data: statusData } = useQuery({
+    queryKey: ['attendance', 'widget-status'],
+    queryFn: async () => {
+      try {
+        const { data } = await httpClient.get('/attendance/widget-status');
+        return data;
+      } catch (_) {
+        return { open: false, since: null, elapsed_seconds: null, attendance_id: null };
+      }
+    },
+    refetchInterval: 30000,
+  });
+
   useEffect(() => {
-    if (!isCheckedIn) return undefined;
+    if (statusData) {
+      dispatch(syncWidgetStatus(statusData));
+    }
+  }, [statusData, dispatch]);
+
+  useEffect(() => {
+    if (!isCheckedIn || !checkInAt) return undefined;
     setElapsed(formatDuration(checkInAt));
     const interval = setInterval(() => setElapsed(formatDuration(checkInAt)), 1000);
     return () => clearInterval(interval);
@@ -44,31 +74,58 @@ export const AttendanceWidget = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, dispatch]);
 
-  // TODO: swap for a real check-in/check-out endpoint once the attendance
-  // service supports partial updates — for now this is fire-and-forget.
-  const recordAttendance = useMutation({
-    mutationFn: (payload) => httpClient.post('/attendance/', payload),
+  // Real backend check-in endpoint
+  const checkInMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await httpClient.post('/attendance/check-in');
+      return data;
+    },
+    onSuccess: (data) => {
+      setErrorMessage('');
+      dispatch(checkIn({ checkInAt: data.check_in, attendanceId: data.id }));
+      queryClient.invalidateQueries({ queryKey: ['attendance'] });
+    },
+    onError: (err) => {
+      const detail = err?.response?.data?.detail;
+      setErrorMessage(typeof detail === 'string' ? detail : 'Unable to check in. Please try again.');
+    },
   });
 
+  // Real backend check-out endpoint with schedule overtime computation
+  const checkOutMutation = useMutation({
+    mutationFn: async () => {
+      let targetId = attendanceId;
+      if (!targetId) {
+        const { data: st } = await httpClient.get('/attendance/widget-status');
+        targetId = st?.attendance_id;
+      }
+      if (!targetId) {
+        throw new Error('No active attendance session found to check out');
+      }
+      const { data } = await httpClient.post(`/attendance/${targetId}/check-out`);
+      return data;
+    },
+    onSuccess: () => {
+      setErrorMessage('');
+      dispatch(checkOut());
+      queryClient.invalidateQueries({ queryKey: ['attendance'] });
+    },
+    onError: (err) => {
+      const detail = err?.response?.data?.detail;
+      setErrorMessage(typeof detail === 'string' ? detail : 'Unable to check out. Please try again.');
+    },
+  });
+
+  const isPending = checkInMutation.isPending || checkOutMutation.isPending;
+
   const handleCheckIn = () => {
-    const now = new Date().toISOString();
-    dispatch(checkIn(now));
-    recordAttendance.mutate({
-      date: now.slice(0, 10),
-      check_in: now,
-      status: 'PRESENT',
-    });
+    setErrorMessage('');
+    checkInMutation.mutate();
   };
 
   const handleCheckOut = () => {
-    const now = new Date().toISOString();
-    recordAttendance.mutate({
-      date: checkInAt.slice(0, 10),
-      check_in: checkInAt,
-      check_out: now,
-      status: 'PRESENT',
-    });
-    dispatch(checkOut());
+    setErrorMessage('');
+    checkOutMutation.mutate();
   };
 
   return (
@@ -102,7 +159,7 @@ export const AttendanceWidget = () => {
                   <span className="font-semibold text-white">{elapsed}</span>
                 </div>
                 <div className="flex items-center justify-between py-3 text-sm">
-                  <span className="text-slate-300">Today</span>
+                  <span className="text-slate-300">Session Elapsed</span>
                   <span className="font-semibold text-white">{elapsed}</span>
                 </div>
               </>
@@ -110,17 +167,23 @@ export const AttendanceWidget = () => {
               <p className="mt-4 border-b border-slate-700/50 pb-4 text-sm text-slate-500">No active session today.</p>
             )}
 
+            {errorMessage && (
+              <p className="mt-2 text-xs text-rose-400 leading-tight">{errorMessage}</p>
+            )}
+
             <button
               type="button"
+              disabled={isPending}
               onClick={isCheckedIn ? handleCheckOut : handleCheckIn}
-              className="mt-4 w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
             >
+              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {isCheckedIn ? 'Check Out' : 'Check In'}
             </button>
           </div>
 
           <p className="border-t border-slate-700/60 px-5 py-3 text-xs text-slate-500">
-            Employees can mark attendance from the quick widget and review records from the Attendance module.
+            Punches are recorded to the attendance service and verified against your working schedule.
           </p>
         </div>
       )}

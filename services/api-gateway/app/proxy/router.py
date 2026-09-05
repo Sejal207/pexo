@@ -21,6 +21,7 @@ SERVICE_ROUTES: dict[str, str] = {
     "employees": settings.HR_SERVICE_URL,
     "departments": settings.HR_SERVICE_URL,
     "schedules": settings.HR_SERVICE_URL,
+    "working-schedules": settings.HR_SERVICE_URL,
     "contracts": settings.HR_SERVICE_URL,
     "job-positions": settings.HR_SERVICE_URL,
     "attendance": settings.ATTENDANCE_SERVICE_URL,

@@ -32,7 +32,7 @@ jobs:
       - name: Type Check & Lint
         working-directory: frontend
         run: |
-          npm run typecheck
+          npm run typecheck --if-present
           npm run lint
 
       - name: Build

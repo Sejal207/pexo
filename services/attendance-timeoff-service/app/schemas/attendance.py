@@ -38,3 +38,4 @@ class WidgetStatusOut(BaseModel):
     open: bool
     since: Optional[datetime] = None
     elapsed_seconds: Optional[int] = None
+    attendance_id: Optional[UUID] = None
