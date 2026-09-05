@@ -1,7 +1,10 @@
 import json
+
 import redis.asyncio as redis
+
 from app.clients.hr_client import HRClient
 from app.clients.payroll_client import PayrollClient
+
 
 class DashboardAggregator:
     def __init__(self, redis_client: redis.Redis):

@@ -1,5 +1,7 @@
 import httpx
+
 from app.core.config import settings
+
 
 class HRClient:
     def __init__(self):
