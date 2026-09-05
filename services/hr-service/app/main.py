@@ -5,8 +5,8 @@ from app.routers import employees, departments, schedules, contracts
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_url="/openapi.json",
-    docs_url="/docs"
+    openapi_url="/api/v1/openapi.json",
+    docs_url="/api/v1/docs",
 )
 
 app.add_middleware(
@@ -17,11 +17,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(employees.router)
-app.include_router(departments.router)
-app.include_router(schedules.router)
-app.include_router(contracts.router)
+# API v1 prefix
+app.include_router(employees.router, prefix="/api/v1")
+app.include_router(departments.router, prefix="/api/v1")
+app.include_router(schedules.router, prefix="/api/v1")
+app.include_router(contracts.router, prefix="/api/v1")
+
 
 @app.get("/health")
+@app.get("/api/v1/health")
 async def health_check():
     return {"status": "healthy", "service": "hr-service"}
