@@ -16,8 +16,10 @@ from fastapi import HTTPException
 from sqlalchemy import select, and_, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.contract import Contract
+from app.models.working_schedule import WorkingSchedule
 from app.schemas.contract import ContractCreate, ContractUpdate
 from app.services.audit_service import AuditService
 
@@ -88,6 +90,83 @@ class ContractService:
                 detail=f"No active contract for employee {employee_id} on {as_of}",
             )
         return contract
+
+    async def list_eligible_for_period(
+        self,
+        *,
+        period_start: date,
+        period_end: date,
+        salary_structure_id: UUID,
+        department_id: Optional[UUID] = None,
+        contract_type: Optional[str] = None,
+    ) -> list[dict]:
+        """
+        Pipeline 4 (payroll-service) eligibility resolution: every ACTIVE
+        contract on `salary_structure_id` whose [start_date, end_date) range
+        overlaps [period_start, period_end] — never a single as-of date, since
+        a payrun spans a whole period. Working hours resolve the same way
+        Pipeline 2 does: the contract's own schedule override, else the
+        employee's default schedule.
+        """
+        stmt = (
+            select(Contract)
+            .options(selectinload(Contract.employee))
+            .where(
+                and_(
+                    Contract.status == "ACTIVE",
+                    Contract.salary_structure_id == salary_structure_id,
+                    Contract.start_date <= period_end,
+                    or_(Contract.end_date.is_(None), Contract.end_date >= period_start),
+                )
+            )
+        )
+        if department_id:
+            stmt = stmt.where(Contract.department_id == department_id)
+        if contract_type:
+            stmt = stmt.where(Contract.contract_type == contract_type)
+
+        result = await self.db.execute(stmt)
+        contracts = list(result.scalars().all())
+
+        schedule_ids = {
+            c.working_schedule_id or (c.employee.default_working_schedule_id if c.employee else None)
+            for c in contracts
+        }
+        schedule_ids.discard(None)
+
+        hours_by_schedule: dict[UUID, float] = {}
+        if schedule_ids:
+            ws_result = await self.db.execute(
+                select(WorkingSchedule.id, WorkingSchedule.total_weekly_hours).where(
+                    WorkingSchedule.id.in_(schedule_ids)
+                )
+            )
+            hours_by_schedule = {row[0]: row[1] for row in ws_result.all()}
+
+        rows = []
+        for c in contracts:
+            resolved_schedule_id = c.working_schedule_id or (
+                c.employee.default_working_schedule_id if c.employee else None
+            )
+            rows.append(
+                {
+                    "contract_id": c.id,
+                    "employee_id": c.employee_id,
+                    "employee_code": c.employee.employee_code if c.employee else None,
+                    "employee_first_name": c.employee.first_name if c.employee else None,
+                    "employee_last_name": c.employee.last_name if c.employee else None,
+                    "contract_type": c.contract_type,
+                    "start_date": c.start_date,
+                    "end_date": c.end_date,
+                    "wage_amount": c.wage_amount,
+                    "wage_type": c.wage_type,
+                    "salary_structure_id": c.salary_structure_id,
+                    "department_id": c.department_id,
+                    "job_position_id": c.job_position_id,
+                    "working_hours": hours_by_schedule.get(resolved_schedule_id),
+                }
+            )
+        return rows
 
     async def create(
         self,

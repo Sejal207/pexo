@@ -49,3 +49,26 @@ class ContractOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+
+class EligibleContractOut(BaseModel):
+    """
+    One row of Pipeline 4's payrun-wizard eligibility check: an ACTIVE contract
+    on the chosen salary structure whose date range overlaps the requested
+    period. Carries just enough employee/schedule context (name, working hours)
+    so payroll-service's Step 2 table never has to make a second round trip.
+    """
+    contract_id: UUID
+    employee_id: UUID
+    employee_code: str
+    employee_first_name: str
+    employee_last_name: str
+    contract_type: str
+    start_date: date
+    end_date: Optional[date] = None
+    wage_amount: Decimal
+    wage_type: str
+    salary_structure_id: UUID
+    department_id: Optional[UUID] = None
+    job_position_id: Optional[UUID] = None
+    working_hours: Optional[Decimal] = None

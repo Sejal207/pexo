@@ -26,6 +26,10 @@ SERVICE_ROUTES: dict[str, str] = {
     "job-positions": settings.HR_SERVICE_URL,
     "attendance": settings.ATTENDANCE_SERVICE_URL,
     "time-off": settings.ATTENDANCE_SERVICE_URL,
+    "payruns": settings.PAYROLL_SERVICE_URL,
+    "payslips": settings.PAYROLL_SERVICE_URL,
+    "salary-structures": settings.PAYROLL_SERVICE_URL,
+    "salary-rules": settings.PAYROLL_SERVICE_URL,
 }
 
 # Headers that must not be forwarded verbatim (hop-by-hop / recomputed by httpx).

@@ -2,7 +2,8 @@
 <html>
 <body>
     <h2>Your Payslip is Ready</h2>
-    <p>Dear Employee,</p>
-    <p>Your payslip for the recent pay cycle has been generated and is attached/available on Pexo portal.</p>
+    <p>Dear {{ employee_name }},</p>
+    <p>Your payslip for the recent pay cycle has been generated and is available here:</p>
+    <p><a href="{{ pdf_url }}">{{ pdf_url }}</a></p>
 </body>
 </html>

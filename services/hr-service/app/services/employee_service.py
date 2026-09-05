@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.employee import Employee
 from app.models.contract import Contract
+from app.models.employee_bank_account import EmployeeBankAccount
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate
 from app.services.audit_service import AuditService
 
@@ -53,6 +54,18 @@ class EmployeeService:
             select(func.count()).where(Contract.employee_id == employee_id)
         )
         return result.scalar_one()
+
+    async def list_bank_accounts(self, employee_id: UUID) -> list[EmployeeBankAccount]:
+        """
+        Consumed by payroll-service (Pipeline 5) to flag "A/C missing" during
+        payrun Validate. Also usable directly by HR/the employee themselves.
+        """
+        result = await self.db.execute(
+            select(EmployeeBankAccount)
+            .where(EmployeeBankAccount.employee_id == employee_id)
+            .order_by(EmployeeBankAccount.is_primary.desc(), EmployeeBankAccount.created_at)
+        )
+        return list(result.scalars().all())
 
     async def create(
         self,

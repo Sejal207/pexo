@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.dependencies import require_writer, require_any_role
-from app.schemas.contract import ContractCreate, ContractUpdate, ContractOut
+from app.schemas.contract import ContractCreate, ContractUpdate, ContractOut, EligibleContractOut
 from app.services.contract_service import ContractService
 
 router = APIRouter(prefix="/contracts", tags=["Contracts"])
@@ -58,6 +58,31 @@ async def get_active_contract(
     target_date = as_of or date.today()
     service = ContractService(db)
     return await service.get_active(employee_id=employee_id, as_of=target_date)
+
+
+@router.get("/eligible", response_model=list[EligibleContractOut])
+async def list_eligible_contracts(
+    period_start: date = Query(..., description="Payrun period start"),
+    period_end: date = Query(..., description="Payrun period end"),
+    salary_structure_id: UUID = Query(..., description="Only contracts on this salary structure"),
+    department_id: Optional[UUID] = Query(None),
+    contract_type: Optional[str] = Query(None, description="PERMANENT/FIXED_TERM/PROBATION/INTERN"),
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(require_any_role("HR_PAYROLL_USER", "HR_PAYROLL_MANAGER", "HR_MANAGER")),
+):
+    """
+    Internal, consumed by payroll-service (Pipeline 4): resolves the eligible-
+    employee set for a payrun wizard's Step 1 -> Step 2 handoff. MUST be
+    declared before /{contract_id} so 'eligible' is not matched as a UUID.
+    """
+    service = ContractService(db)
+    return await service.list_eligible_for_period(
+        period_start=period_start,
+        period_end=period_end,
+        salary_structure_id=salary_structure_id,
+        department_id=department_id,
+        contract_type=contract_type,
+    )
 
 
 @router.post("/", response_model=ContractOut, status_code=status.HTTP_201_CREATED)

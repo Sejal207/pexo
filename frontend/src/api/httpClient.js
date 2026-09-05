@@ -22,9 +22,19 @@ export const setAccessToken = (token) => {
 
 export const getAccessToken = () => accessToken;
 
+// The gateway only proxies business endpoints under /api/v1/* — /auth/* lives
+// at the root instead. Every call site across the app writes paths like
+// '/employees/' with neither prefix; add /api/v1 here, once, rather than at
+// every call site (and rather than baking it into baseURL, which would break
+// /auth/* the same way).
+const API_PREFIX = '/api/v1';
+
 httpClient.interceptors.request.use((config) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  if (config.url && !config.url.startsWith('/auth') && !config.url.startsWith(API_PREFIX)) {
+    config.url = `${API_PREFIX}${config.url}`;
   }
   return config;
 });

@@ -5,7 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.dependencies import require_writer, require_any_role, scope_to_own_employee
-from app.schemas.employee import EmployeeCreate, EmployeeUpdate, EmployeeOut, EmployeeDetail
+from app.schemas.employee import (
+    EmployeeCreate,
+    EmployeeUpdate,
+    EmployeeOut,
+    EmployeeDetail,
+    EmployeeBankAccountOut,
+)
 from app.schemas.contract import ContractOut
 from app.services.employee_service import EmployeeService
 from app.services.contract_service import ContractService
@@ -103,3 +109,20 @@ async def get_employee_contracts(
 
     contract_service = ContractService(db)
     return await contract_service.list_by_employee(employee_id)
+
+
+@router.get("/{employee_id}/bank-accounts", response_model=list[EmployeeBankAccountOut])
+async def get_employee_bank_accounts(
+    employee_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(
+        require_any_role("HR_MANAGER", "HR_PAYROLL_MANAGER", "HR_PAYROLL_USER")
+    ),
+):
+    """Internal, consumed by payroll-service (Pipeline 5) to check for a
+    missing-bank-account warning during payrun Validate."""
+    emp_service = EmployeeService(db)
+    emp = await emp_service.get_by_id(employee_id)
+    if not emp:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found")
+    return await emp_service.list_bank_accounts(employee_id)

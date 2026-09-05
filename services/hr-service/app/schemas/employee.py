@@ -60,6 +60,18 @@ class EmployeeOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class EmployeeBankAccountOut(BaseModel):
+    id: UUID
+    employee_id: UUID
+    account_holder_name: str
+    account_number: str
+    ifsc_code: Optional[str] = None
+    bank_name: Optional[str] = None
+    is_primary: bool
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
 class EmployeeDetail(EmployeeOut):
     """Full response for GET /employees/{id} — includes private fields + smart-button counts."""
     phone: Optional[str] = None

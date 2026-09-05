@@ -1,21 +1,42 @@
 from datetime import datetime
+import uuid
+from decimal import Decimal
+from typing import Optional, Any
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import String, Integer, Numeric, DateTime, ForeignKey, Index, func
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
 
 class PayslipLine(Base):
-    __tablename__ = "payslip_lines"
+    """
+    One rule's computed contribution to a payslip. salary_rule_code is a
+    denormalized text snapshot on purpose (schema.sql): historical payslips
+    stay accurate even if a rule is later renamed/deleted.
+    """
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    payslip_id: Mapped[int] = mapped_column(Integer, ForeignKey("payslips.id"), nullable=False)
-    rule_code: Mapped[str] = mapped_column(String(50), nullable=False)
-    rule_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    category: Mapped[str] = mapped_column(String(50), nullable=False)
-    sequence: Mapped[int] = mapped_column(Integer, default=10)
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    __tablename__ = "payslip_line"
+    __table_args__ = (
+        Index("idx_payslip_line_payslip", "payslip_id", "sequence"),
+    )
 
-    payslip = relationship("Payslip", back_populates="lines")
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    payslip_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("payslip.id", ondelete="CASCADE"), nullable=False
+    )
+    salary_rule_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("salary_rule.id", ondelete="SET NULL"), nullable=True
+    )
+    salary_rule_code: Mapped[str] = mapped_column(String(50), nullable=False)
+    sequence: Mapped[int] = mapped_column(Integer, nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    computation_detail: Mapped[Optional[Any]] = mapped_column(JSONB, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    payslip: Mapped["Payslip"] = relationship("Payslip", back_populates="lines")  # type: ignore[name-defined]

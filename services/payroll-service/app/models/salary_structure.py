@@ -1,17 +1,42 @@
 from datetime import datetime
+import uuid
+from typing import Optional
 
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import String, Boolean, Text, DateTime, func
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
 
 class SalaryStructure(Base):
-    __tablename__ = "salary_structures"
+    """A named bundle of salary rules (Pipeline 5 owns the rules themselves).
+    Referenced by contract.salary_structure_id (hr-service) as a plain UUID —
+    cross-schema, no FK — and by payrun.salary_structure_id here, in-schema.
+    """
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    __tablename__ = "salary_structure"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
     code: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
 
-    structure_rules = relationship("SalaryStructureRule", back_populates="salary_structure")
+    structure_rules: Mapped[list["SalaryStructureRule"]] = relationship(  # type: ignore[name-defined]
+        "SalaryStructureRule",
+        back_populates="salary_structure",
+        cascade="all, delete-orphan",
+        order_by="SalaryStructureRule.sequence",
+    )

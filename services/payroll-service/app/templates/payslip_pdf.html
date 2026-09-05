@@ -15,9 +15,9 @@
 <body>
     <div class="header">
         <h1>Pexo</h1>
-        <h3>Payslip for Period: {{ payrun.period_start }} to {{ payrun.period_end }}</h3>
+        <h3>Payslip for Period: {{ payslip.period_start }} to {{ payslip.period_end }}</h3>
     </div>
-    <p><strong>Employee ID:</strong> {{ payslip.employee_id }}</p>
+    <p><strong>Employee:</strong> {{ employee_name }}</p>
     <table>
         <thead>
             <tr>
@@ -27,17 +27,25 @@
             </tr>
         </thead>
         <tbody>
-            {% for line in payslip.lines %}
+            {% for line in lines %}
             <tr>
-                <td>{{ line.rule_name }}</td>
-                <td>{{ line.category }}</td>
+                <td>{{ line.rule_name or line.salary_rule_code }}</td>
+                <td>{{ line.category or "" }}</td>
                 <td>{{ "%.2f"|format(line.amount) }}</td>
             </tr>
             {% endfor %}
+            {% if payslip.gross_amount is not none %}
+            <tr class="total-row">
+                <td colspan="2">Gross Salary</td>
+                <td>{{ "%.2f"|format(payslip.gross_amount) }}</td>
+            </tr>
+            {% endif %}
+            {% if payslip.net_amount is not none %}
             <tr class="total-row">
                 <td colspan="2">Net Salary</td>
-                <td>{{ "%.2f"|format(payslip.net_salary) }}</td>
+                <td>{{ "%.2f"|format(payslip.net_amount) }}</td>
             </tr>
+            {% endif %}
         </tbody>
     </table>
 </body>
