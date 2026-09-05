@@ -1,11 +1,12 @@
 import asyncio
 from logging.config import fileConfig
-from sqlalchemy.ext.asyncio import create_async_engine
+
 from sqlalchemy import pool, text
+from sqlalchemy.ext.asyncio import create_async_engine
+
 from alembic import context
 from app.core.config import settings
 from app.core.database import Base
-from app.models import salary_structure, salary_rule, salary_structure_rule, payrun, payslip, payslip_line, audit_log
 
 config = context.config
 if config.config_file_name is not None:

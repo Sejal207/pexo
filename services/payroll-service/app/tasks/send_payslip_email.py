@@ -1,15 +1,15 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
+from app.core.async_utils import run_async
+from app.core.task_db import TaskSessionLocal
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.clients.hr_client import HRClient
-from app.core.async_utils import run_async
 from app.core.celery_app import celery_app
 from app.core.security import mint_service_token
-from app.core.task_db import TaskSessionLocal
 from app.models.payslip import Payslip
 
 _TEMPLATE_ENV = Environment(loader=FileSystemLoader("app/mail/templates"))
@@ -18,9 +18,10 @@ _TEMPLATE_ENV = Environment(loader=FileSystemLoader("app/mail/templates"))
 async def _send_email(payslip_id: str) -> dict:
     # Deferred: mail_config/fastapi_mail and pdf_service (weasyprint) are
     # heavy/optional-native-dep imports — see generate_pdf.py.
-    from app.mail.mail_config import mail_config
     from app.services.pdf_service import render_and_upload_payslip_pdf
     from fastapi_mail import FastMail, MessageSchema, MessageType
+
+    from app.mail.mail_config import mail_config
 
     async with TaskSessionLocal() as db:
         result = await db.execute(

@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
+from app.services.payslip_compute_service import PayslipComputeService
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +11,6 @@ from app.models.payrun import Payrun
 from app.models.payslip import Payslip
 from app.models.payslip_line import PayslipLine
 from app.models.salary_rule import SalaryRule
-from app.services.payslip_compute_service import PayslipComputeService
 from app.tasks.generate_pdf import generate_pdf_task
 
 

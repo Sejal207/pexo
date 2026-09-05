@@ -1,14 +1,14 @@
-from datetime import datetime
 import uuid
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from sqlalchemy import String, Text, Numeric, Boolean, DateTime, ForeignKey, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
-from app.core.enums import RuleCategoryEnum, ComputationTypeEnum
+from app.core.enums import ComputationTypeEnum, RuleCategoryEnum
 
 
 class SalaryRule(Base):

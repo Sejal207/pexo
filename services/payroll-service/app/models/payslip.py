@@ -1,16 +1,30 @@
-from datetime import date, datetime
+from __future__ import annotations
+
 import uuid
+from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import (
-    Boolean, Date, DateTime, ForeignKey, Numeric, Text, UniqueConstraint, Index, func
+    Boolean,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Numeric,
+    Text,
+    UniqueConstraint,
+    func,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.core.enums import PayslipStatusEnum
+
+if TYPE_CHECKING:
+    from app.models.payrun import Payrun
+    from app.models.payslip_line import PayslipLine
 
 
 class Payslip(Base):

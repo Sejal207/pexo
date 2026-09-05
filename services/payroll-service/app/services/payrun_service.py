@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+from app.services.audit_service import AuditService
+from app.services.payslip_compute_service import PayslipComputeService
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -28,8 +30,6 @@ from app.models.payrun import Payrun
 from app.models.payslip import Payslip
 from app.models.salary_structure import SalaryStructure
 from app.schemas.payrun import EligibleEmployeesRequest, PayrunCreate
-from app.services.audit_service import AuditService
-from app.services.payslip_compute_service import PayslipComputeService
 from app.tasks.generate_pdf import generate_pdf_task
 from app.tasks.send_payslip_email import send_payslip_email_task
 
