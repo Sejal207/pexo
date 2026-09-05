@@ -1,28 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronDown, LucideIcon } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
-interface NavDropdownItem {
-  label: string;
-  to: string;
-}
-
-interface NavDropdownProps {
-  label: string;
-  icon: LucideIcon;
-  items: NavDropdownItem[];
-}
-
-export const NavDropdown: React.FC<NavDropdownProps> = ({ label, icon: Icon, items }) => {
+export const NavDropdown = ({ label, icon: Icon, items }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef(null);
   const location = useLocation();
 
   const isActive = items.some((item) => location.pathname.startsWith(item.to));
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+    function handleClickOutside(event) {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     }
