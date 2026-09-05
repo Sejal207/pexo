@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from app.services.salary_structure_service import SalaryStructureService
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,7 +14,6 @@ from app.schemas.salary_structure import (
     StructureRuleAttach,
     StructureRuleOut,
 )
-from app.services.salary_structure_service import SalaryStructureService
 
 router = APIRouter(prefix="/salary-structures", tags=["Salary Structures"])
 

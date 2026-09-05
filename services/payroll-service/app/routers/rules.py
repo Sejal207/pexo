@@ -1,6 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
+from app.services.salary_rule_service import SalaryRuleService
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,7 +9,6 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.dependencies import require_structure_writer
 from app.schemas.salary_rule import SalaryRuleCreate, SalaryRuleOut
-from app.services.salary_rule_service import SalaryRuleService
 
 router = APIRouter(prefix="/salary-rules", tags=["Salary Rules"])
 

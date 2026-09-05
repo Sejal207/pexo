@@ -1,13 +1,18 @@
-from datetime import datetime
-import uuid
-from decimal import Decimal
-from typing import Optional, Any
+from __future__ import annotations
 
-from sqlalchemy import String, Integer, Numeric, DateTime, ForeignKey, Index, func
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+import uuid
+from datetime import datetime
+from decimal import Decimal
+from typing import TYPE_CHECKING, Any, Optional
+
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, Numeric, String, func
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.payslip import Payslip
 
 
 class PayslipLine(Base):

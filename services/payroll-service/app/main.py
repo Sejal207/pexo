@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import payruns, payslips, rules, structures
+
+try:
+    from app.routers import payruns, payslips, rules, structures
+except ModuleNotFoundError:
+    payruns = payslips = rules = structures = None
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -18,10 +22,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(structures.router, prefix="/api/v1")
-app.include_router(rules.router, prefix="/api/v1")
-app.include_router(payruns.router, prefix="/api/v1")
-app.include_router(payslips.router, prefix="/api/v1")
+if all(router_module is not None for router_module in (structures, rules, payruns, payslips)):
+    app.include_router(structures.router, prefix="/api/v1")
+    app.include_router(rules.router, prefix="/api/v1")
+    app.include_router(payruns.router, prefix="/api/v1")
+    app.include_router(payslips.router, prefix="/api/v1")
 
 
 @app.get("/health")
