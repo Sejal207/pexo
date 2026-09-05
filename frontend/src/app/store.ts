@@ -6,6 +6,7 @@ import payrollReducer from '../features/payroll/payrollSlice';
 import attendanceReducer from '../features/attendance/attendanceSlice';
 import attendanceWidgetReducer from '../features/attendance/attendanceWidgetSlice';
 import allocationsReducer from '../features/timeoff/allocationsSlice';
+import timeOffReducer from '../features/timeoff/timeOffSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     attendance: attendanceReducer,
     attendanceWidget: attendanceWidgetReducer,
     allocations: allocationsReducer,
+    timeOff: timeOffReducer,
   },
 });
 
