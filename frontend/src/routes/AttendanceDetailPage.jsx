@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit3, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Edit3, X, AlertCircle, Loader2 } from 'lucide-react';
 import { useAttendanceDetailQuery, useCorrectAttendance } from '../features/attendance/useAttendanceQueries';
 
 const Field = ({ label, value }) => (
