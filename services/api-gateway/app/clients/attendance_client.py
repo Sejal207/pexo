@@ -1,5 +1,7 @@
 import httpx
+
 from app.core.config import settings
+
 
 class AttendanceClient:
     def __init__(self):
