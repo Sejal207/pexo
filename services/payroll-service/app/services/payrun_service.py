@@ -17,7 +17,6 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from app.clients.hr_client import HRClient
 from app.services.audit_service import AuditService
 from app.services.payslip_compute_service import PayslipComputeService
 from fastapi import HTTPException
@@ -26,6 +25,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.clients.hr_client import HRClient
 from app.models.payrun import Payrun
 from app.models.payslip import Payslip
 from app.models.salary_structure import SalaryStructure

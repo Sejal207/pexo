@@ -1,13 +1,13 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from app.clients.hr_client import HRClient
 from app.core.async_utils import run_async
 from app.core.task_db import TaskSessionLocal
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from app.clients.hr_client import HRClient
 from app.core.celery_app import celery_app
 from app.core.security import mint_service_token
 from app.models.payslip import Payslip
