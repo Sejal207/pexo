@@ -6,6 +6,7 @@ import { EmployeesPage } from './routes/EmployeesPage';
 import { EmployeeDetailPage } from './routes/EmployeeDetailPage';
 import { ContractsPage } from './routes/ContractsPage';
 import { ContractDetailPage } from './routes/ContractDetailPage';
+import { AttendanceDetailPage } from './routes/AttendanceDetailPage';
 
 export const App: React.FC = () => {
   return (
@@ -21,6 +22,7 @@ export const App: React.FC = () => {
             <Route path="/contracts/:id" element={<ContractDetailPage />} />
             <Route path="/time-off" element={<div className="p-8 text-slate-300">Time Off module</div>} />
             <Route path="/attendance" element={<div className="p-8 text-slate-300">Attendance & Leave Tracking Module</div>} />
+            <Route path="/attendance/:id" element={<AttendanceDetailPage />} />
             <Route path="/payroll" element={<div className="p-8 text-slate-300">Payroll Calculation & Payrun Wizard Module</div>} />
           </Routes>
         </main>

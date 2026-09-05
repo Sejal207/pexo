@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Calendar, CalendarClock, DollarSign, FileText, LayoutDashboard } from 'lucide-react';
+import { AttendanceWidget } from '../features/attendance/components/AttendanceWidget';
 
 export const Navbar: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ export const Navbar: React.FC = () => {
           <Link to="/time-off" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><CalendarClock className="w-4 h-4" /><span>Time Off</span></Link>
           <Link to="/payroll" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><DollarSign className="w-4 h-4" /><span>Payroll</span></Link>
         </nav>
+        <AttendanceWidget />
       </div>
     </header>
   );
