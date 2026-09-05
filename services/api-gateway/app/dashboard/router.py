@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
 import redis.asyncio as redis
+from fastapi import APIRouter, Depends
+
 from app.core.redis_client import get_redis_client
 from app.dashboard.aggregator import DashboardAggregator
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 @router.get("/kpis")
-async def get_dashboard_kpis(r_client: redis.Redis = Depends(get_redis_client)):
+async def get_dashboard_kpis(r_client: Annotated[redis.Redis, Depends(get_redis_client)]):
     aggregator = DashboardAggregator(r_client)
     return await aggregator.get_kpis()

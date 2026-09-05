@@ -35,4 +35,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          pytest services/api-gateway/tests
+          PYTHONPATH=services/api-gateway pytest services/api-gateway/tests
