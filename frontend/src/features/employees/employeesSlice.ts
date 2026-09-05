@@ -9,7 +9,7 @@ interface EmployeesUIState {
 const initialState: EmployeesUIState = {
   searchTerm: '',
   selectedDepartmentId: null,
-  viewMode: 'kanban',
+  viewMode: 'list',
 };
 
 export const employeesSlice = createSlice({
