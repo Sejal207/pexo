@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Pexo - HR Service"
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/Pexo"
-    DB_SCHEMA: str = "hr"
+    DB_SCHEMA: str = "public"
     SECRET_KEY: str = "supersecretjwtkey_change_in_production_Pexo"
     ALGORITHM: str = "HS256"
 

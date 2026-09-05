@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
@@ -8,21 +9,17 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-class UserSignup(BaseModel):
+class UserOut(BaseModel):
+    id: UUID
     email: EmailStr
-    password: str
-    full_name: str
-    roles: List[str] = ["EMPLOYEE"]
+    is_active: bool
+    employee_id: Optional[UUID] = None
+    full_name: Optional[str] = None
+    roles: List[str] = []
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-
-class UserOut(BaseModel):
-    id: int
-    email: EmailStr
-    full_name: str
-    is_active: bool
-    roles: List[str] = []
-    created_at: datetime
-    model_config = ConfigDict(from_attributes=True)
+    user: UserOut

@@ -413,3 +413,19 @@ INSERT INTO role (name, description) VALUES
   ('HR_PAYROLL_MANAGER', 'Full CRUD on Payroll, Salary Structures, and Salary Rules'),
   ('ADMIN', 'Full system access')
 ON CONFLICT (name) DO NOTHING;
+
+-- =====================================================================
+-- 21. REFRESH TOKENS  (opaque, hashed; supports rotation & revocation)
+-- Added post-hoc for the login/refresh-cookie auth flow — not present in
+-- the original schema pass. See refresh_token.sql for the standalone,
+-- already-applied-safe version of this same DDL.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS refresh_token (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
+  token_hash        VARCHAR(255) NOT NULL UNIQUE,
+  expires_at        TIMESTAMPTZ NOT NULL,
+  revoked_at        TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_refresh_token_user ON refresh_token(user_id);
