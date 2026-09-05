@@ -1,134 +1,146 @@
 import React from 'react';
-import clsx from 'clsx';
-import { LayoutGrid, List, Plus, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Search, LayoutGrid, List as ListIcon, AlertCircle, RotateCw } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { EmployeeCard } from '../features/employees/components/EmployeeCard';
-import { setSearchTerm, setViewMode } from '../features/employees/employeesSlice';
 import { useEmployeeQueries } from '../features/employees/useEmployeeQueries';
+import { setSearchTerm, setViewMode } from '../features/employees/employeesSlice';
+import { EmployeeCard } from '../features/employees/components/EmployeeCard';
 
 export const EmployeesPage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { searchTerm, viewMode } = useAppSelector((state) => state.employees);
-  const { employees, isLoading, isError } = useEmployeeQueries();
+  const { employeesQuery } = useEmployeeQueries();
 
-  const displayedEmployees = employees.filter((employee) => (
-    employee.name.toLowerCase().includes(searchTerm.toLowerCase())
-    || employee.workEmail.toLowerCase().includes(searchTerm.toLowerCase())
-  ));
+  const all = employeesQuery.data ?? [];
+  const employees = all.filter((e) => e.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const activeCount = all.filter((e) => e.status === 'active').length;
 
-  const handleEmployeeClick = (employee) => {
-    // TODO: open shared Employee Form
-    console.log(employee.id);
-  };
-
-  const handleNewEmployee = () => {
-    // TODO: open shared Employee Form in create mode
-    console.log('new employee');
-  };
+  const handleCardClick = (employee) => navigate(`/employees/${employee.id}`);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-8 max-w-7xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-extrabold text-white tracking-tight">Employees</h1>
-        <p className="text-slate-400 mt-1">List view for sort, filter and bulk scanning</p>
+        <p className="text-slate-400 mt-1">
+          {all.length > 0
+            ? `${all.length} people · ${activeCount} active · viewing as ${viewMode}`
+            : `Default view: ${viewMode}`}
+        </p>
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button
-            type="button"
-            onClick={handleNewEmployee}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-brand-600 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
-          >
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3 flex-1 min-w-[280px]">
+          <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-4 py-2.5 rounded-lg transition-colors">
             <Plus className="w-4 h-4" />
             New
           </button>
-          <label className="relative block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <div className="relative flex-1 max-w-sm">
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
-              type="search"
               value={searchTerm}
-              onChange={(event) => dispatch(setSearchTerm(event.target.value))}
-              placeholder="Search employees..."
-              className="w-full sm:w-72 rounded-xl border border-slate-700 bg-slate-800/60 py-2.5 pl-10 pr-4 text-sm text-slate-100 placeholder:text-slate-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+              onChange={(e) => dispatch(setSearchTerm(e.target.value))}
+              placeholder="Search employees"
+              className="w-full bg-slate-800 border border-slate-700/60 rounded-lg pl-9 pr-3 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
             />
-          </label>
+          </div>
         </div>
 
-        <div className="inline-flex self-start rounded-xl border border-slate-700 bg-slate-800/60 p-1">
+        <div className="relative inline-flex rounded-lg border border-slate-700/60 bg-slate-800 p-1">
+          <span
+            className={`absolute inset-y-1 w-[calc(50%-2px)] rounded-md bg-indigo-600 transition-transform duration-200 ${
+              viewMode === 'list' ? 'translate-x-full' : 'translate-x-0'
+            }`}
+          />
           <button
-            type="button"
             onClick={() => dispatch(setViewMode('kanban'))}
-            className={clsx('inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition', viewMode === 'kanban' ? 'bg-brand-600 text-white shadow' : 'text-slate-400 hover:text-white')}
+            className={`relative z-10 flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              viewMode === 'kanban' ? 'text-white' : 'text-slate-400'
+            }`}
           >
             <LayoutGrid className="w-4 h-4" />
             Kanban
           </button>
           <button
-            type="button"
             onClick={() => dispatch(setViewMode('list'))}
-            className={clsx('inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition', viewMode === 'list' ? 'bg-brand-600 text-white shadow' : 'text-slate-400 hover:text-white')}
+            className={`relative z-10 flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              viewMode === 'list' ? 'text-white' : 'text-slate-400'
+            }`}
           >
-            <List className="w-4 h-4" />
+            <ListIcon className="w-4 h-4" />
             List
           </button>
         </div>
       </div>
 
-      {isLoading && <p className="text-slate-400">Loading employees...</p>}
-      {isError && <p className="text-rose-400">Unable to load employees.</p>}
-
-      {!isLoading && !isError && (
-        viewMode === 'kanban' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {displayedEmployees.map((employee) => (
-              <EmployeeCard key={employee.id} employee={employee} onClick={handleEmployeeClick} />
-            ))}
+      {employeesQuery.isError && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
+          <div className="flex items-center gap-2 text-red-300 text-sm">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            Couldn't load employees. The HR service might be offline.
           </div>
-        ) : (
-          <div className="overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 backdrop-blur shadow-xl">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-700/50 text-slate-400">
-                  <tr>
-                    <th className="px-6 py-4 font-semibold">Employee</th>
-                    <th className="px-6 py-4 font-semibold">Work Email</th>
-                    <th className="px-6 py-4 font-semibold">Job Position</th>
-                    <th className="px-6 py-4 font-semibold">Department</th>
-                    <th className="px-6 py-4 font-semibold">Status</th>
+          <button
+            onClick={() => employeesQuery.refetch()}
+            className="flex items-center gap-1.5 text-sm font-medium text-red-300 hover:text-red-200 shrink-0"
+          >
+            <RotateCw className="w-3.5 h-3.5" />
+            Retry
+          </button>
+        </div>
+      )}
+
+      {!employeesQuery.isError && employees.length === 0 && (
+        <p className="text-sm text-slate-500 py-8 text-center">
+          {searchTerm ? `No one matches "${searchTerm}".` : 'No employees yet — add your first one.'}
+        </p>
+      )}
+
+      {viewMode === 'kanban' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {employees.map((employee) => (
+            <EmployeeCard key={employee.id} employee={employee} onClick={handleCardClick} />
+          ))}
+        </div>
+      ) : (
+        employees.length > 0 && (
+          <div className="rounded-lg border border-slate-700/60 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-slate-400 border-b border-slate-700/60">
+                  <th className="p-4 font-medium">Name</th>
+                  <th className="p-4 font-medium">Role</th>
+                  <th className="p-4 font-medium">Department</th>
+                  <th className="p-4 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map((employee) => (
+                  <tr
+                    key={employee.id}
+                    onClick={() => handleCardClick(employee)}
+                    className="border-b border-slate-700/40 last:border-0 hover:border-slate-600 cursor-pointer"
+                  >
+                    <td className="p-4 text-white font-medium">{employee.name}</td>
+                    <td className="p-4 text-slate-400">{employee.role}</td>
+                    <td className="p-4 text-slate-400">{employee.department}</td>
+                    <td className="p-4">
+                      <span className={employee.status === 'active' ? 'text-emerald-400' : 'text-rose-400'}>
+                        {employee.status === 'active' ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {displayedEmployees.map((employee) => (
-                    <tr
-                      key={employee.id}
-                      onClick={() => handleEmployeeClick(employee)}
-                      className="cursor-pointer border-b border-slate-700/50 last:border-b-0 transition hover:bg-slate-700/30"
-                    >
-                      <td className="px-6 py-4 font-medium text-white">{employee.name}</td>
-                      <td className="px-6 py-4 text-slate-300">{employee.workEmail}</td>
-                      <td className="px-6 py-4 text-slate-300">{employee.jobPosition}</td>
-                      <td className="px-6 py-4 text-slate-300">{employee.department}</td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-2 text-slate-300">
-                          <span className={clsx('w-2.5 h-2.5 rounded-full', employee.status === 'Active' ? 'bg-emerald-400' : 'bg-slate-500')} />
-                          {employee.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         )
       )}
 
-      {!isLoading && !isError && displayedEmployees.length === 0 && (
-        <p className="text-slate-400">No employees found.</p>
-      )}
-
-      <p className="text-sm text-slate-500">Useful note: the list view is the main entry point for opening a specific employee record quickly.</p>
+      <p className="text-xs text-slate-500 pt-2">
+        Kanban is good for browsing; clicking a card opens the same Employee Form used everywhere else.
+      </p>
     </div>
   );
 };
+
+export default EmployeesPage;

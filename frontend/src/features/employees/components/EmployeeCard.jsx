@@ -1,38 +1,41 @@
 import React from 'react';
-import clsx from 'clsx';
 
-const getInitials = (name) => name
-  .split(' ')
-  .filter(Boolean)
-  .map((part) => part[0])
-  .slice(0, 2)
-  .join('')
-  .toUpperCase();
+const DEPARTMENT_ACCENT = {
+  Finance: { bar: 'bg-indigo-400', tint: 'bg-indigo-400/10 border-indigo-400/30 text-indigo-300' },
+  HR: { bar: 'bg-violet-400', tint: 'bg-violet-400/10 border-violet-400/30 text-violet-300' },
+  Engineering: { bar: 'bg-emerald-400', tint: 'bg-emerald-400/10 border-emerald-400/30 text-emerald-300' },
+};
+const DEFAULT_ACCENT = { bar: 'bg-rose-400', tint: 'bg-slate-500/10 border-slate-500/30 text-slate-300' };
+
+function getInitials(name) {
+  return name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+}
 
 export const EmployeeCard = ({ employee, onClick }) => {
+  const accent = DEPARTMENT_ACCENT[employee.department] ?? DEFAULT_ACCENT;
+  const isActive = employee.status === 'active';
+
   return (
     <button
-      type="button"
       onClick={() => onClick(employee)}
-      className="w-full p-5 rounded-2xl bg-slate-800/60 border border-slate-700/50 backdrop-blur shadow-xl text-left transition hover:border-brand-500/60 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+      className="group relative flex items-start gap-3 text-left p-5 pl-6 rounded-lg bg-slate-800 border border-slate-700/60 hover:border-slate-600 transition-colors overflow-hidden"
     >
-      <div className="flex items-start gap-4">
-        <div className="w-11 h-11 shrink-0 rounded-xl bg-brand-600/20 border border-brand-500/30 flex items-center justify-center text-sm font-bold text-brand-100">
-          {getInitials(employee.name)}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="font-semibold text-white truncate">{employee.name}</h2>
-              <p className="text-sm text-slate-400 mt-1 truncate">{employee.workEmail}</p>
-            </div>
-            <span className={clsx(
-              'mt-1.5 w-2.5 h-2.5 shrink-0 rounded-full',
-              employee.status === 'Active' ? 'bg-emerald-400' : 'bg-slate-500',
-            )} />
-          </div>
-          <p className="text-sm text-slate-300 mt-4">{employee.jobPosition}</p>
-          <p className="text-sm text-slate-400 mt-1">{employee.department}</p>
+      <span className={`absolute left-0 top-0 bottom-0 w-1 ${accent.bar}`} />
+
+      <div className={`w-11 h-11 shrink-0 rounded-full border flex items-center justify-center font-bold text-sm ${accent.tint}`}>
+        {getInitials(employee.name)}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-white truncate group-hover:text-white">{employee.name}</p>
+        <p className="text-sm text-slate-400 truncate">{employee.role}</p>
+
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-xs text-slate-500">{employee.department}</span>
+          <span className={`flex items-center gap-1.5 text-xs font-medium ${isActive ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+            {isActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
       </div>
     </button>

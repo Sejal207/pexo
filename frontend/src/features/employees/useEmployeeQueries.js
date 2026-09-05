@@ -1,21 +1,36 @@
 import { useQuery } from '@tanstack/react-query';
 import { httpClient } from '../../api/httpClient';
 
-const formatStatus = (status) => status
-  .toLowerCase()
-  .split('_')
-  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  .join(' ');
+/**
+ * @typedef {Object} Employee
+ * @property {number} id
+ * @property {string} name
+ * @property {string} role
+ * @property {string} department
+ * @property {'active'|'inactive'} status
+ */
+
+/**
+ * @typedef {Object} EmployeeDetail
+ * @property {number} id
+ * @property {string} name
+ * @property {string} role
+ * @property {string} department
+ * @property {'active'|'inactive'} status
+ * @property {string} email
+ * @property {string} phone
+ * @property {string} jobPosition
+ * @property {string} manager
+ * @property {string} workingSchedule
+ * @property {string} workLocation
+ * @property {string} company
+ * @property {string} workEmail
+ * @property {number} timeOffCount
+ * @property {number} contractsCount
+ * @property {number} attendanceCount
+ */
 
 export const useEmployeeQueries = () => {
-  const departmentsQuery = useQuery({
-    queryKey: ['departments'],
-    queryFn: async () => {
-      const { data } = await httpClient.get('/departments/');
-      return data;
-    },
-  });
-
   const employeesQuery = useQuery({
     queryKey: ['employees'],
     queryFn: async () => {
@@ -24,20 +39,14 @@ export const useEmployeeQueries = () => {
     },
   });
 
-  const departmentsById = new Map((departmentsQuery.data ?? []).map((dept) => [dept.id, dept.name]));
-
-  const employees = (employeesQuery.data ?? []).map((employee) => ({
-    id: employee.id,
-    name: `${employee.first_name} ${employee.last_name}`,
-    workEmail: employee.email,
-    jobPosition: employee.job_position_id ? `Position #${employee.job_position_id}` : '—',
-    department: departmentsById.get(employee.department_id) ?? '—',
-    status: formatStatus(employee.status),
-  }));
-
-  return {
-    employees,
-    isLoading: employeesQuery.isLoading || departmentsQuery.isLoading,
-    isError: employeesQuery.isError || departmentsQuery.isError,
-  };
+  return { employeesQuery };
 };
+
+export const useEmployeeDetailQuery = (id) => useQuery({
+  queryKey: ['employees', id],
+  queryFn: async () => {
+    const { data } = await httpClient.get(`/employees/${id}`);
+    return data;
+  },
+  enabled: Boolean(id),
+});
