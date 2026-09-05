@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Calendar, CalendarClock, DollarSign, FileText, LayoutDashboard } from 'lucide-react';
 import { AttendanceWidget } from '../features/attendance/components/AttendanceWidget';
+import { NavDropdown } from './NavDropdown';
 
 export const Navbar: React.FC = () => {
   return (
@@ -16,7 +17,16 @@ export const Navbar: React.FC = () => {
           <Link to="/employees" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><Users className="w-4 h-4" /><span>Employees</span></Link>
           <Link to="/contracts" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><FileText className="w-4 h-4" /><span>Contracts</span></Link>
           <Link to="/attendance" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><Calendar className="w-4 h-4" /><span>Attendance</span></Link>
-          <Link to="/time-off" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><CalendarClock className="w-4 h-4" /><span>Time Off</span></Link>
+          <NavDropdown
+            label="Time Off"
+            icon={CalendarClock}
+            items={[
+              { label: 'Dashboard', to: '/time-off' },
+              { label: 'Time offs', to: '/time-off/requests' },
+              { label: 'Time off Types', to: '/time-off/types' },
+              { label: 'Allocations', to: '/time-off/allocations' },
+            ]}
+          />
           <Link to="/payroll" className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700/50 hover:text-white transition"><DollarSign className="w-4 h-4" /><span>Payroll</span></Link>
         </nav>
         <AttendanceWidget />
