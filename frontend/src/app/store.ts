@@ -3,6 +3,7 @@ import authReducer from '../features/auth/authSlice';
 import employeesReducer from '../features/employees/employeesSlice';
 import contractsReducer from '../features/contracts/contractsSlice';
 import payrollReducer from '../features/payroll/payrollSlice';
+import attendanceReducer from '../features/attendance/attendanceSlice';
 import attendanceWidgetReducer from '../features/attendance/attendanceWidgetSlice';
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     employees: employeesReducer,
     contracts: contractsReducer,
     payroll: payrollReducer,
+    attendance: attendanceReducer,
     attendanceWidget: attendanceWidgetReducer,
   },
 });
