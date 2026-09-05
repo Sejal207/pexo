@@ -1,1 +1,1 @@
-"""Shared common python libraries across PeoplePay360 services."""
+"""Shared common python libraries across Pexo services."""

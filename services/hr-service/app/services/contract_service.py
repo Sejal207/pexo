@@ -35,6 +35,7 @@ class ContractService:
         *,
         status: Optional[str] = None,
         department_id: Optional[UUID] = None,
+        employee_id: Optional[UUID] = None,
         skip: int = 0,
         limit: int = 100,
     ) -> list[Contract]:
@@ -43,6 +44,8 @@ class ContractService:
             stmt = stmt.where(Contract.status == status)
         if department_id:
             stmt = stmt.where(Contract.department_id == department_id)
+        if employee_id:
+            stmt = stmt.where(Contract.employee_id == employee_id)
         stmt = stmt.offset(skip).limit(limit).order_by(Contract.start_date.desc())
         result = await self.db.execute(stmt)
         return list(result.scalars().all())

@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
-metadata = MetaData(schema=settings.DB_SCHEMA)
+schema = settings.DB_SCHEMA if settings.DB_SCHEMA and settings.DB_SCHEMA != "public" else None
+metadata = MetaData(schema=schema)
 
 
 class Base(DeclarativeBase):

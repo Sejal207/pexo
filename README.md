@@ -1,6 +1,6 @@
-# PeoplePay360
+# Pexo
 
-PeoplePay360 is an enterprise-grade HR, Attendance, and Payroll Management System built with a modular microservice architecture and a modern React frontend.
+Pexo is an enterprise-grade HR, Attendance, and Payroll Management System built with a modular microservice architecture and a modern React frontend.
 
 ## Architecture Overview
 

@@ -1,5 +1,5 @@
 {
-  "name": "peoplepay360-frontend",
+  "name": "Pexo-frontend",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -38,4 +38,3 @@
     "vite": "^5.1.6"
   }
 }
-

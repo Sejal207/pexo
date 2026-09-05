@@ -1,6 +1,4 @@
--- =====================================================================
--- PeoplePay360 — Full Database Schema (PostgreSQL 15+)
--- =====================================================================
+
 -- Conventions:
 --   - Primary keys: UUID (gen_random_uuid()) for all entities
 --   - Money fields: NUMERIC(12,2)

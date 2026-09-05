@@ -26,15 +26,19 @@ def _extract_user_id(current_user: dict) -> Optional[UUID]:
 async def list_contracts(
     status_filter: Optional[str] = Query(None, alias="status", description="Filter by contract status"),
     department_id: Optional[UUID] = Query(None, description="Filter by department ID"),
+    employee_id: Optional[UUID] = Query(None, alias="employee_id", description="Filter by employee ID"),
+    employee_id_camel: Optional[UUID] = Query(None, alias="employeeId", description="Filter by employee ID (camelCase)"),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=500),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_any_role("HR_MANAGER", "HR_PAYROLL_MANAGER", "HR_PAYROLL_USER")),
+    current_user: dict = Depends(require_any_role("HR_MANAGER", "HR_PAYROLL_MANAGER", "HR_PAYROLL_USER", "EMPLOYEE")),
 ):
+    target_emp_id = employee_id or employee_id_camel
     service = ContractService(db)
     return await service.list_all(
         status=status_filter,
         department_id=department_id,
+        employee_id=target_emp_id,
         skip=skip,
         limit=limit,
     )
@@ -71,7 +75,7 @@ async def create_contract(
 async def get_contract(
     contract_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_any_role("HR_MANAGER", "HR_PAYROLL_MANAGER", "HR_PAYROLL_USER")),
+    current_user: dict = Depends(require_any_role("HR_MANAGER", "HR_PAYROLL_MANAGER", "HR_PAYROLL_USER", "EMPLOYEE")),
 ):
     service = ContractService(db)
     contract = await service.get_by_id(contract_id)

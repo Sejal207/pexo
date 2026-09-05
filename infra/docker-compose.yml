@@ -3,12 +3,12 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: peoplepay360-postgres
+    container_name: Pexo-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-peoplepay360}
+      POSTGRES_DB: ${POSTGRES_DB:-Pexo}
     ports:
       - "5432:5432"
     volumes:
@@ -22,7 +22,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: peoplepay360-redis
+    container_name: Pexo-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -36,7 +36,7 @@ services:
 
   azurite:
     image: mcr.microsoft.com/azure-storage/azurite
-    container_name: peoplepay360-azurite
+    container_name: Pexo-azurite
     restart: unless-stopped
     ports:
       - "10000:10000"
@@ -47,14 +47,14 @@ services:
     build:
       context: ../services/hr-service
       dockerfile: Dockerfile
-    container_name: peoplepay360-hr-service
+    container_name: Pexo-hr-service
     restart: unless-stopped
     ports:
       - "8001:8001"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/peoplepay360
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/Pexo
       - DB_SCHEMA=hr
-      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_peoplepay360}
+      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_Pexo}
     depends_on:
       postgres:
         condition: service_healthy
@@ -63,14 +63,14 @@ services:
     build:
       context: ../services/attendance-timeoff-service
       dockerfile: Dockerfile
-    container_name: peoplepay360-attendance-service
+    container_name: Pexo-attendance-service
     restart: unless-stopped
     ports:
       - "8002:8002"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/peoplepay360
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/Pexo
       - DB_SCHEMA=attendance_timeoff
-      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_peoplepay360}
+      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_Pexo}
     depends_on:
       postgres:
         condition: service_healthy
@@ -79,15 +79,15 @@ services:
     build:
       context: ../services/payroll-service
       dockerfile: Dockerfile
-    container_name: peoplepay360-payroll-service
+    container_name: Pexo-payroll-service
     restart: unless-stopped
     ports:
       - "8003:8003"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/peoplepay360
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/Pexo
       - DB_SCHEMA=payroll
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_peoplepay360}
+      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_Pexo}
       - HR_SERVICE_URL=http://hr-service:8001
       - ATTENDANCE_SERVICE_URL=http://attendance-timeoff-service:8002
       - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;}
@@ -101,14 +101,14 @@ services:
     build:
       context: ../services/payroll-service
       dockerfile: Dockerfile.worker
-    container_name: peoplepay360-payroll-worker
+    container_name: Pexo-payroll-worker
     restart: unless-stopped
     command: celery -A celery_worker worker --loglevel=info
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/peoplepay360
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/Pexo
       - DB_SCHEMA=payroll
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_peoplepay360}
+      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_Pexo}
       - HR_SERVICE_URL=http://hr-service:8001
       - ATTENDANCE_SERVICE_URL=http://attendance-timeoff-service:8002
     depends_on:
@@ -121,11 +121,11 @@ services:
     build:
       context: ../services/payroll-service
       dockerfile: Dockerfile.worker
-    container_name: peoplepay360-payroll-beat
+    container_name: Pexo-payroll-beat
     restart: unless-stopped
     command: celery -A celery_worker beat --loglevel=info
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/peoplepay360
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/Pexo
       - DB_SCHEMA=payroll
       - REDIS_URL=redis://redis:6379/0
     depends_on:
@@ -138,15 +138,15 @@ services:
     build:
       context: ../services/api-gateway
       dockerfile: Dockerfile
-    container_name: peoplepay360-api-gateway
+    container_name: Pexo-api-gateway
     restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/peoplepay360
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/Pexo
       - DB_SCHEMA=gateway
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_peoplepay360}
+      - SECRET_KEY=${SECRET_KEY:-supersecretjwtkey_change_in_production_Pexo}
       - HR_SERVICE_URL=http://hr-service:8001
       - ATTENDANCE_SERVICE_URL=http://attendance-timeoff-service:8002
       - PAYROLL_SERVICE_URL=http://payroll-service:8003
@@ -160,7 +160,7 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile
-    container_name: peoplepay360-frontend
+    container_name: Pexo-frontend
     restart: unless-stopped
     ports:
       - "5173:5173"
@@ -171,7 +171,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: peoplepay360-nginx
+    container_name: Pexo-nginx
     restart: unless-stopped
     ports:
       - "80:80"

@@ -1,4 +1,4 @@
-# PeoplePay360 — Team Context Document
+# Pexo — Team Context Document
 
 _This is the single source of truth for the team. Read this before touching any code. Anything not covered here should be added here, not left as tribal knowledge in a chat thread._
 
@@ -6,7 +6,7 @@ _This is the single source of truth for the team. Read this before touching any 
 
 ## 1. What this project actually is
 
-**PeoplePay360** is our hackathon build: an **Integrated HR & Payroll Operations Platform**. We chose this over two other options (an Accounting system, and a Sales Ops platform called DealFlow360) because it gives us the best balance of:
+**Pexo** is our hackathon build: an **Integrated HR & Payroll Operations Platform**. We chose this over two other options (an Accounting system, and a Sales Ops platform called DealFlow360) because it gives us the best balance of:
 - Rich, provable **data modeling** (contracts, schedules, leave, salary rules all interlinked)
 - A genuine **rule-engine** component (Salary Rules executed in sequence) that differentiates us from a CRUD app
 - A controllable build timeline compared to the more real-time/algorithmic sales platform
@@ -127,4 +127,4 @@ Full schema: see `schema.sql`. Full relationship diagram: see `er_diagram.md`.
 | Payslip | One employee's computed pay for one Payrun |
 | Allocation | An employee's entitled leave balance for a given Time Off Type and validity period |
 | Active contract | The one contract whose date range covers "today" (or the payroll period being processed) |
-| Blended risk score | _(Not applicable to PeoplePay360 — this term belongs to the DealFlow360 alternative we didn't choose.)_ |
+| Blended risk score | _(Not applicable to Pexo — this term belongs to the DealFlow360 alternative we didn't choose.)_ |

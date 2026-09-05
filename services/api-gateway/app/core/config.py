@@ -1,11 +1,11 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "PeoplePay360 - API Gateway"
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/peoplepay360"
+    PROJECT_NAME: str = "Pexo - API Gateway"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/Pexo"
     DB_SCHEMA: str = "gateway"
     REDIS_URL: str = "redis://redis:6379/0"
-    SECRET_KEY: str = "supersecretjwtkey_change_in_production_peoplepay360"
+    SECRET_KEY: str = "supersecretjwtkey_change_in_production_Pexo"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 

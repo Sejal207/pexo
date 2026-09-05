@@ -1,5 +1,5 @@
 /**
- * Auto-generated TypeScript definitions for PeoplePay360 OpenAPI services.
+ * Auto-generated TypeScript definitions for Pexo OpenAPI services.
  */
 
 export type UserRole = "ADMIN" | "HR_MANAGER" | "PAYROLL_OFFICER" | "EMPLOYEE";
