@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { DashboardPage } from './routes/DashboardPage';
+import { EmployeesPage } from './routes/EmployeesPage';
 
 export const App: React.FC = () => {
   return (
@@ -11,7 +12,7 @@ export const App: React.FC = () => {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
-            <Route path="/employees" element={<div className="p-8 text-slate-300">Employees Directory Module</div>} />
+            <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/attendance" element={<div className="p-8 text-slate-300">Attendance & Leave Tracking Module</div>} />
             <Route path="/payroll" element={<div className="p-8 text-slate-300">Payroll Calculation & Payrun Wizard Module</div>} />
           </Routes>
