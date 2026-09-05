@@ -1,11 +1,11 @@
 import React from 'react';
 
 const DEPARTMENT_ACCENT = {
-  Finance: { bar: 'bg-amber-400', tint: 'bg-amber-400/10 border-amber-400/30 text-amber-300' },
+  Finance: { bar: 'bg-indigo-400', tint: 'bg-indigo-400/10 border-indigo-400/30 text-indigo-300' },
   HR: { bar: 'bg-violet-400', tint: 'bg-violet-400/10 border-violet-400/30 text-violet-300' },
   Engineering: { bar: 'bg-emerald-400', tint: 'bg-emerald-400/10 border-emerald-400/30 text-emerald-300' },
 };
-const DEFAULT_ACCENT = { bar: 'bg-slate-500', tint: 'bg-slate-500/10 border-slate-500/30 text-slate-300' };
+const DEFAULT_ACCENT = { bar: 'bg-rose-400', tint: 'bg-slate-500/10 border-slate-500/30 text-slate-300' };
 
 function getInitials(name) {
   return name.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
@@ -32,8 +32,8 @@ export const EmployeeCard = ({ employee, onClick }) => {
 
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xs text-slate-500">{employee.department}</span>
-          <span className={`flex items-center gap-1.5 text-xs font-medium ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+          <span className={`flex items-center gap-1.5 text-xs font-medium ${isActive ? 'text-emerald-400' : 'text-rose-400'}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-rose-400'}`} />
             {isActive ? 'Active' : 'Inactive'}
           </span>
         </div>

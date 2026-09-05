@@ -5,7 +5,7 @@ const formatCurrency = (amount) => new Intl.NumberFormat('en-IN', {
   style: 'currency', currency: 'INR', maximumFractionDigits: 0,
 }).format(amount);
 
-const Field = ({ label, value, monetary }) => <div><p className="mb-2 text-sm text-slate-400">{label}</p><div className={`rounded-lg border border-slate-700/60 bg-slate-800 px-3 py-2 ${monetary ? 'text-amber-400 font-semibold' : 'text-white'}`}>{value}</div></div>;
+const Field = ({ label, value, monetary }) => <div><p className="mb-2 text-sm text-slate-400">{label}</p><div className={`rounded-lg border border-slate-700/60 bg-slate-800 px-3 py-2 ${monetary ? 'text-amber-400 font-semibold' : label === 'Status' ? (value === 'Running' ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold') : 'text-white'}`}>{value}</div></div>;
 
 export const ContractDetailPage = () => {
   const { id } = useParams();

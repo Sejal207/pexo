@@ -118,13 +118,13 @@ export const EmployeesPage = () => {
                   <tr
                     key={employee.id}
                     onClick={() => handleCardClick(employee)}
-                    className="border-b border-slate-700/40 last:border-0 hover:bg-slate-800/60 cursor-pointer"
+                    className="border-b border-slate-700/40 last:border-0 hover:border-slate-600 cursor-pointer"
                   >
                     <td className="p-4 text-white font-medium">{employee.name}</td>
                     <td className="p-4 text-slate-400">{employee.role}</td>
                     <td className="p-4 text-slate-400">{employee.department}</td>
                     <td className="p-4">
-                      <span className={employee.status === 'active' ? 'text-emerald-400' : 'text-slate-500'}>
+                      <span className={employee.status === 'active' ? 'text-emerald-400' : 'text-rose-400'}>
                         {employee.status === 'active' ? 'Active' : 'Inactive'}
                       </span>
                     </td>
