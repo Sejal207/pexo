@@ -1,12 +1,13 @@
 import React from 'react';
-import { Users, CreditCard, Clock, CheckCircle2 } from 'lucide-react';
+import { Users, CreditCard, Clock, CheckCircle2, UserPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const DashboardPage: React.FC = () => {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-extrabold text-white tracking-tight">Enterprise Overview</h1>
-        <p className="text-slate-400 mt-1">Real-time metrics across HR, Attendance, and Payroll systems.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div><h1 className="text-3xl font-extrabold text-white tracking-tight">Enterprise Overview</h1><p className="text-slate-400 mt-1">Real-time metrics across HR, Attendance, and Payroll systems.</p></div>
+        <Link to="/signup" className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"><UserPlus className="h-4 w-4" />Sign up</Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

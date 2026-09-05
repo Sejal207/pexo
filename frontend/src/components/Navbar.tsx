@@ -25,6 +25,7 @@ export const Navbar: React.FC = () => {
               { label: 'Time offs', to: '/time-off/requests' },
               { label: 'Time off Types', to: '/time-off/types' },
               { label: 'Allocations', to: '/time-off/allocations' },
+              { label: 'Working Schedules', to: '/schedules' },
             ]}
           />
           <NavDropdown

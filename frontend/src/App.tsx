@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { DashboardPage } from './routes/DashboardPage';
 import { EmployeesPage } from './routes/EmployeesPage';
@@ -12,15 +12,23 @@ import { AllocationsPage } from './routes/AllocationsPage';
 import { AllocationDetailPage } from './routes/AllocationDetailPage';
 import { TimeOffRequestsPage } from './routes/TimeOffRequestsPage';
 import { TimeOffRequestDetailPage } from './routes/TimeOffRequestDetailPage';
+import { WorkingSchedulesPage } from './routes/WorkingSchedulesPage';
+import { WorkingScheduleDetailPage } from './routes/WorkingScheduleDetailPage';
+import { TimeOffTypesPage } from './routes/TimeOffTypesPage';
+import { TimeOffTypeDetailPage } from './routes/TimeOffTypeDetailPage';
+import { SalaryStructuresPage, SalaryStructureDetailPage, SalaryRulesPage, SalaryRuleDetailPage, NewPayrunWizard, PayrunsPage, PayrunDetailPage, PayslipsPage, PayslipDetailPage, PayrollDashboardPage } from './routes/PayrollPages';
+import { SignupPage } from './routes/SignupPage';
 
-export const App: React.FC = () => {
+const AppShell: React.FC = () => {
+  const { pathname } = useLocation();
+  const isAuthPage = pathname === '/signup';
   return (
-    <Router>
       <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
-        <Navbar />
+        {!isAuthPage && <Navbar />}
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/employees/:id" element={<EmployeeDetailPage />} />
             <Route path="/contracts" element={<ContractsPage />} />
@@ -31,20 +39,29 @@ export const App: React.FC = () => {
             <Route path="/time-off" element={<div className="p-8 text-slate-300">Time Off Dashboard</div>} />
             <Route path="/time-off/requests" element={<TimeOffRequestsPage />} />
             <Route path="/time-off/requests/:id" element={<TimeOffRequestDetailPage />} />
-            <Route path="/time-off/types" element={<div className="p-8 text-slate-300">Time Off Types</div>} />
+            <Route path="/time-off/types" element={<TimeOffTypesPage />} />
+            <Route path="/time-off/types/:id" element={<TimeOffTypeDetailPage />} />
             <Route path="/time-off/allocations" element={<AllocationsPage />} />
             <Route path="/time-off/allocations/:id" element={<AllocationDetailPage />} />
+            <Route path="/schedules" element={<WorkingSchedulesPage />} />
+            <Route path="/schedules/:id" element={<WorkingScheduleDetailPage />} />
 
-            <Route path="/payroll" element={<div className="p-8 text-slate-300">Payroll Dashboard</div>} />
-            <Route path="/payroll/payruns" element={<div className="p-8 text-slate-300">Payruns</div>} />
-            <Route path="/payroll/payslips" element={<div className="p-8 text-slate-300">Payslips</div>} />
-            <Route path="/payroll/structures" element={<div className="p-8 text-slate-300">Salary Structures</div>} />
-            <Route path="/payroll/rules" element={<div className="p-8 text-slate-300">Salary Rules</div>} />
+            <Route path="/payroll" element={<PayrollDashboardPage />} />
+            <Route path="/payroll/payruns" element={<PayrunsPage />} />
+            <Route path="/payroll/payruns/new" element={<NewPayrunWizard />} />
+            <Route path="/payroll/payruns/:id" element={<PayrunDetailPage />} />
+            <Route path="/payroll/payslips" element={<PayslipsPage />} />
+            <Route path="/payroll/payslips/:id" element={<PayslipDetailPage />} />
+            <Route path="/payroll/structures" element={<SalaryStructuresPage />} />
+            <Route path="/payroll/structures/:id" element={<SalaryStructureDetailPage />} />
+            <Route path="/payroll/rules" element={<SalaryRulesPage />} />
+            <Route path="/payroll/rules/:id" element={<SalaryRuleDetailPage />} />
           </Routes>
         </main>
       </div>
-    </Router>
   );
 };
+
+export const App: React.FC = () => <Router><AppShell /></Router>;
 
 export default App;
