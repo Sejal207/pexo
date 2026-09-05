@@ -17,3 +17,21 @@ AuditActionEnum = PgEnum(
     name="audit_action",
     create_type=False,
 )
+
+TimeoffUnitEnum = PgEnum(
+    "DAYS", "HOURS",
+    name="timeoff_unit",
+    create_type=False,
+)
+
+ApprovalStatusEnum = PgEnum(
+    "PENDING", "APPROVED", "REFUSED",
+    name="approval_status",
+    create_type=False,
+)
+
+RequestStatusEnum = PgEnum(
+    "DRAFT", "SUBMITTED", "APPROVED", "REFUSED", "CANCELLED",
+    name="request_status",
+    create_type=False,
+)

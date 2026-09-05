@@ -47,7 +47,12 @@ async def run_async_migrations() -> None:
         settings.DATABASE_URL,
         poolclass=pool.NullPool,
     )
-    async with connectable.connect() as connection:
+    # `engine.begin()`, not `.connect()`: SQLAlchemy 2.0 connections roll back
+    # on close unless explicitly committed, and Alembic's own transaction
+    # management here only wraps the migration operations, not the raw
+    # CREATE SCHEMA above them — without an outer commit, everything is
+    # silently discarded even though Alembic reports success.
+    async with connectable.begin() as connection:
         await connection.run_sync(do_run_migrations)
     await connectable.dispose()
 

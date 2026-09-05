@@ -19,6 +19,21 @@ def require_writer(current_user: dict = Depends(get_current_user)) -> dict:
     return current_user
 
 
+def require_any_role(*roles: str):
+    allowed = set(roles) | {"ADMIN"}
+
+    def role_checker(current_user: dict = Depends(get_current_user)) -> dict:
+        user_roles = set(current_user.get("roles", []))
+        if not user_roles & allowed:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission denied: requires one of {list(roles)}",
+            )
+        return current_user
+
+    return role_checker
+
+
 def get_self_employee_id(current_user: dict) -> Optional[UUID]:
     raw = current_user.get("employee_id")
     if not raw:
