@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import settings
 
-metadata = MetaData(schema=settings.DB_SCHEMA)
+metadata = MetaData(schema=settings.DB_SCHEMA or None)
 
 class Base(DeclarativeBase):
     metadata = metadata

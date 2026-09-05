@@ -8,9 +8,15 @@ module.exports = {
     'eslint:recommended',
     'plugin:react-hooks/recommended',
   ],
-  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
   plugins: [
-    '@typescript-eslint',
+    'react',
     'react-refresh',
   ],
   settings: {
@@ -19,8 +25,7 @@ module.exports = {
     },
   },
   rules: {
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^sm$' }],
+    'react/jsx-uses-vars': 'error',
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },

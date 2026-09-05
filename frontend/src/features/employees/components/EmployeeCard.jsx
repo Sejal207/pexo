@@ -1,5 +1,3 @@
-import React from 'react';
-
 const DEPARTMENT_ACCENT = {
   Finance: { bar: 'bg-indigo-400', tint: 'bg-indigo-400/10 border-indigo-400/30 text-indigo-300' },
   HR: { bar: 'bg-violet-400', tint: 'bg-violet-400/10 border-violet-400/30 text-violet-300' },

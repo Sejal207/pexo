@@ -48,10 +48,10 @@ run_service() {
 mkdir -p logs
 
 # Start backend services
-run_service hr-service 8001 hr
-run_service attendance-timeoff-service 8002 attendance_timeoff
-run_service payroll-service 8003 payroll
-run_service api-gateway 8000 gateway
+run_service hr-service 8001 public
+run_service attendance-timeoff-service 8002 public
+run_service payroll-service 8003 public
+run_service api-gateway 8000 public
 
 # Frontend
 cd "$(pwd)/frontend"

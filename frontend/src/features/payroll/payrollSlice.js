@@ -1,11 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface PayrollUIState {
-  activeWizardStep: number;
-  selectedPayrunId: number | null;
-}
-
-const initialState: PayrollUIState = {
+const initialState = {
   activeWizardStep: 1,
   selectedPayrunId: null,
 };
@@ -14,10 +9,10 @@ export const payrollSlice = createSlice({
   name: 'payroll',
   initialState,
   reducers: {
-    setWizardStep: (state, action: PayloadAction<number>) => {
+    setWizardStep: (state, action) => {
       state.activeWizardStep = action.payload;
     },
-    setSelectedPayrun: (state, action: PayloadAction<number | null>) => {
+    setSelectedPayrun: (state, action) => {
       state.selectedPayrunId = action.payload;
     },
   },

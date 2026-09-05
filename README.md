@@ -5,17 +5,9 @@ Pexo is an enterprise-grade HR, Attendance, and Payroll Management System built 
 ## Architecture Overview
 
 ```
-                        +----------------------+
-                        |   Nginx / Gateway    |
-                        |   (Reverse Proxy)    |
-                        +----------+-----------+
-                                   |
-                  +----------------+----------------+
-                  |                                 |
-                  v                                 v
         +-------------------+             +-------------------+
         | React Frontend    |             | API Gateway       |
-        | (Vite + Tailwind) |             | (FastAPI + Auth)  |
+        | (Vite + Tailwind) |  --------->  | (FastAPI + Auth)  |
         +-------------------+             +--------+----------+
                                                    |
              +--------------------+----------------+--------------------+
@@ -28,14 +20,16 @@ Pexo is an enterprise-grade HR, Attendance, and Payroll Management System built 
              |                        |                                 |
              +------------------------+---------------------------------+
                                       |
-                      +---------------+---------------+
-                      |                               |
-                      v                               v
-             +------------------+            +------------------+
-             | PostgreSQL DB    |            | Redis & Azurite  |
-             | (Multi-Schema)   |            | (Cache & Storage)|
-             +------------------+            +------------------+
+                                      v
+                            +------------------+
+                            | Neon PostgreSQL  |
+                            | (schema.sql)     |
+                            +------------------+
 ```
+
+Every service runs directly with `uvicorn` — no Docker. They all point at the
+same Neon Postgres database (one flat schema, defined by `schema.sql` at the
+repo root), so there's nothing to containerize locally for the database either.
 
 ## Services Summary
 
@@ -46,29 +40,59 @@ Pexo is an enterprise-grade HR, Attendance, and Payroll Management System built 
 | **attendance-timeoff-service** | `8002` | Clock-in/out attendance, leave requests, leave allocations |
 | **payroll-service** | `8003` | Salary structures, salary rule engine, payrun wizard, payslips |
 | **frontend** | `5173` | React 18, Vite, TailwindCSS, Redux Toolkit, TanStack Query |
-| **PostgreSQL** | `5432` | Schemas: `hr`, `attendance_timeoff`, `payroll`, `gateway` |
-| **Redis** | `6379` | Celery broker, result backend, dashboard metrics caching |
-| **Azurite** | `10000` | Local Azure Blob Storage emulator for payslip PDF archives |
+| **Neon PostgreSQL** | — | One flat database/schema, shared by every service — see `schema.sql` |
+| **Redis** _(optional)_ | `6379` | Only needed for payroll-service's Celery workers and dashboard KPI caching — not required for auth or the core CRUD flows |
+| **Azurite** _(optional)_ | `10000` | Local Azure Blob Storage emulator for payslip PDF archives — only needed once payslip PDF generation is wired up |
 
 ## Getting Started
 
 ### Prerequisites
-- Docker & Docker Compose
-- Node.js 18+ (for local frontend development)
-- Python 3.11+ (for local backend development)
+- Node.js 18+
+- Python 3.11+
+- A Neon Postgres database (or any Postgres 15+) with `schema.sql` and `refresh_token.sql` applied, optionally seeded with `seed_dummy_data.sql`
 
-### Quick Start with Docker Compose
+### Database setup
+Run these once against your Neon database (e.g. via the Neon SQL editor, or `psql "$DATABASE_URL" -f <file>`), in order:
 ```bash
-# 1. Clone the repository and copy environment variables
-cp .env.example .env
+psql "$DATABASE_URL" -f schema.sql
+psql "$DATABASE_URL" -f refresh_token.sql
+psql "$DATABASE_URL" -f seed_dummy_data.sql   # optional: sample employees, users, roles
+```
 
-# 2. Start all services, databases, cache, and frontend
-docker-compose -f infra/docker-compose.yml up --build
+### Running a service locally
+Each service has its own `.env.example` — copy it to `.env` in that service's
+directory and fill in your real `DATABASE_URL` (never commit the real one):
+```bash
+cd services/api-gateway
+cp .env.example .env   # edit DATABASE_URL, etc.
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+Repeat for `hr-service` (port 8001), `attendance-timeoff-service` (port 8002),
+and `payroll-service` (port 8003).
+
+### Running the frontend
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 Access:
-- Frontend Web App: `http://localhost:5173` (or `http://localhost` via Nginx)
+- Frontend Web App: `http://localhost:5173`
 - API Gateway Swagger: `http://localhost:8000/docs`
 - HR Service Swagger: `http://localhost:8001/docs`
 - Attendance Service Swagger: `http://localhost:8002/docs`
 - Payroll Service Swagger: `http://localhost:8003/docs`
+
+### Seeded login credentials
+If you ran `seed_dummy_data.sql`, these accounts are available (password `Password@123` for all):
+
+| Email | Role |
+|---|---|
+| admin@Pexo.com | ADMIN |
+| alice.hr@Pexo.com | HR_MANAGER |
+| bob.payroll@Pexo.com | HR_PAYROLL_MANAGER |
+| charlie.lead@Pexo.com | EMPLOYEE |
+| david.dev@Pexo.com | EMPLOYEE |
+| eva.qa@Pexo.com | EMPLOYEE |

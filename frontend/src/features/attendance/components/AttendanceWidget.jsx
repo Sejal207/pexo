@@ -29,8 +29,8 @@ export const AttendanceWidget = () => {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const { isOpen, isCheckedIn, checkInAt, attendanceId } = useAppSelector((state) => state.attendanceWidget);
-  const userEmail = useAppSelector((state) => state.auth.user?.email);
-  const userName = userEmail ? userEmail.split('@')[0].replace(/[._]/g, ' ') : 'there';
+  const user = useAppSelector((state) => state.auth.user);
+  const userName = user?.full_name ?? (user?.email ? user.email.split('@')[0].replace(/[._]/g, ' ') : 'there');
 
   const [elapsed, setElapsed] = useState(checkInAt ? formatDuration(checkInAt) : '0h00');
   const [errorMessage, setErrorMessage] = useState('');

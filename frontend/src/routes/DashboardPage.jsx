@@ -1,8 +1,7 @@
-import React from 'react';
 import { Users, CreditCard, Clock, CheckCircle2, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export const DashboardPage: React.FC = () => {
+export const DashboardPage = () => {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">

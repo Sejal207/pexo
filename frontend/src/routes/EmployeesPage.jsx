@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, LayoutGrid, List as ListIcon, AlertCircle, RotateCw } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
