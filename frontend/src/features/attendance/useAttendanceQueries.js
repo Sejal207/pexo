@@ -100,7 +100,9 @@ export const useAttendanceDetailQuery = (id) => useQuery({
           department: e.department_name || 'General',
           manager: e.manager_name || 'None',
         };
-      } catch (_) {}
+      } catch (_) {
+        empInfo = null;
+      }
     }
     return normalizeAttendanceDetail(data, empInfo);
   },
