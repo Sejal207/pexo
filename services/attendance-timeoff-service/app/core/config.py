@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     DB_SCHEMA: str = "attendance_timeoff"
     SECRET_KEY: str = "supersecretjwtkey_change_in_production_Pexo"
     ALGORITHM: str = "HS256"
+    HR_SERVICE_URL: str = "http://hr-service:8001"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

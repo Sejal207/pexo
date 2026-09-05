@@ -3,7 +3,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from app.core.config import settings
 from app.core.database import Base
-from app.models import attendance, time_off_type, time_off_allocation, time_off_request
+from app.models import attendance, audit_log, time_off_type, time_off_allocation, time_off_request
 
 config = context.config
 if config.config_file_name is not None:

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.auth.router import router as auth_router
 from app.dashboard.router import router as dashboard_router
+from app.proxy.router import router as proxy_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -20,6 +21,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(dashboard_router)
+app.include_router(proxy_router)
 
 @app.get("/health")
 async def health_check():

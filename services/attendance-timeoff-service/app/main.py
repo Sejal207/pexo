@@ -5,8 +5,8 @@ from app.routers import attendance, time_off
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    openapi_url="/openapi.json",
-    docs_url="/docs"
+    openapi_url="/api/v1/openapi.json",
+    docs_url="/api/v1/docs",
 )
 
 app.add_middleware(
@@ -17,9 +17,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(attendance.router)
-app.include_router(time_off.router)
+app.include_router(attendance.router, prefix="/api/v1")
+app.include_router(time_off.router, prefix="/api/v1")
+
 
 @app.get("/health")
+@app.get("/api/v1/health")
 async def health_check():
     return {"status": "healthy", "service": "attendance-timeoff-service"}
