@@ -10,9 +10,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
-    HR_SERVICE_URL: str = "http://hr-service:8001"
-    ATTENDANCE_SERVICE_URL: str = "http://attendance-timeoff-service:8002"
-    PAYROLL_SERVICE_URL: str = "http://payroll-service:8003"
+    HR_SERVICE_URL: str = "http://localhost:8001"
+    ATTENDANCE_SERVICE_URL: str = "http://localhost:8002"
+    PAYROLL_SERVICE_URL: str = "http://localhost:8003"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

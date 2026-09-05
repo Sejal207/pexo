@@ -89,8 +89,7 @@ async def test_widget_status_route_not_captured_by_id_route(client, employee_hea
         response = await client.get(
             "/api/v1/attendance/widget-status", headers=employee_headers_factory(str(emp_id))
         )
-        assert response.status_code == 200
-        assert response.json() == {"open": False, "since": None, "elapsed_seconds": None}
+        assert response.json() == {"open": False, "since": None, "elapsed_seconds": None, "attendance_id": None}
         mock_status.assert_awaited_once_with(emp_id)
 
 

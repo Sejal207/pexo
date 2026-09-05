@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '../../api/httpClient';
 
 export const normalizeEmployee = (e) => {
@@ -63,3 +63,16 @@ export const useEmployeeDetailQuery = (id) => useQuery({
   },
   enabled: Boolean(id),
 });
+
+export const useUpdateEmployee = (id) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload) => {
+      const { data } = await httpClient.patch(`/employees/${id}`, payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+    },
+  });
+};

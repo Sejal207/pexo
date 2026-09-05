@@ -86,10 +86,15 @@ class AttendanceService:
     async def get_widget_status(self, employee_id: UUID) -> dict:
         open_session = await self.get_open_session(employee_id)
         if not open_session:
-            return {"open": False, "since": None, "elapsed_seconds": None}
+            return {"open": False, "since": None, "elapsed_seconds": None, "attendance_id": None}
         now = datetime.now(timezone.utc)
         elapsed = int((now - open_session.check_in).total_seconds())
-        return {"open": True, "since": open_session.check_in, "elapsed_seconds": elapsed}
+        return {
+            "open": True,
+            "since": open_session.check_in,
+            "elapsed_seconds": elapsed,
+            "attendance_id": open_session.id,
+        }
 
     # ------------------------------------------------------------------ #
     # Check-in / check-out
@@ -261,7 +266,8 @@ class AttendanceService:
             max(worked_hours - expected_hours, Decimal("0")) if expected_hours > 0 else Decimal("0")
         )
 
-        check_in_time = check_in.astimezone(timezone.utc).time()
+        check_in_dt = check_in if check_in.tzinfo else check_in.replace(tzinfo=timezone.utc)
+        check_in_time = check_in_dt.astimezone(timezone.utc).time()
         is_late = datetime.combine(work_date, check_in_time) > (
             datetime.combine(work_date, expected_start) + _LATE_GRACE
         )

@@ -17,7 +17,20 @@ export const AttendancePage = () => {
 
   const displayedRecords = records
     .filter((record) => !todayOnly || record.date === todayIso())
-    .filter((record) => record.employeeName.toLowerCase().includes(searchTerm.toLowerCase()));
+    .filter((record) => (record.employeeName || '').toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'Present':
+        return <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20">Present</span>;
+      case 'Late':
+        return <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-300 border border-amber-500/20">Late</span>;
+      case 'Half Day':
+        return <span className="inline-flex items-center rounded-full bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-300 border border-cyan-500/20">Half Day</span>;
+      default:
+        return <span className="inline-flex items-center rounded-full bg-rose-500/10 px-2.5 py-0.5 text-xs font-semibold text-rose-400 border border-rose-500/20">{status || 'Absent'}</span>;
+    }
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-6">
@@ -66,8 +79,8 @@ export const AttendancePage = () => {
                     <td className="p-4 font-medium text-white">{record.employeeName}</td>
                     <td className="p-4 text-slate-400">{record.checkIn ?? '—'}</td>
                     <td className="p-4 text-slate-400">{record.checkOut ?? '—'}</td>
-                    <td className="p-4 text-slate-400">{record.workedHours.toFixed(2)}</td>
-                    <td className={`p-4 font-medium ${record.status === 'Present' ? 'text-emerald-400' : 'text-rose-400'}`}>{record.status}</td>
+                    <td className="p-4 text-slate-400">{(Number(record.workedHours) || 0).toFixed(2)} hrs</td>
+                    <td className="p-4">{getStatusBadge(record.status)}</td>
                   </tr>
                 ))}
               </tbody>
